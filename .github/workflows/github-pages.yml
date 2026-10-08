@@ -20,17 +20,40 @@ env:
   TOMOS_VERSION: 13e6d8f4634e687ae774a0e3a6d483f6a095b832
   TOMOS_REPOSITORY: https://github.com/tomosweb/tomos.git
   OUTPUT_DIR: build/tomos-github-pages
-  TOMOS_SITE_NAME: ${{ github.event.repository.name }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      site_ready: ${{ steps.site_setup.outputs.ready }}
     permissions:
       contents: read
       pages: read
     steps:
       - name: Checkout site
         uses: actions/checkout@v4
+
+      - name: Read site setup
+        id: site_setup
+        shell: bash
+        run: |
+          set -euo pipefail
+          owner="${GITHUB_REPOSITORY%%/*}"
+          repository="${GITHUB_REPOSITORY#*/}"
+          site_name="$repository"
+          if [ -f .tomos-site-name ]; then
+            site_name="$(cat .tomos-site-name)"
+            if [ -z "$site_name" ] || [ "${#site_name}" -gt 120 ] || [[ "$site_name" == *$'\n'* || "$site_name" == *$'\r'* ]]; then
+              echo "サイト名の設定が不正です。" >&2
+              exit 1
+            fi
+          fi
+          printf 'TOMOS_SITE_NAME=%s\n' "$site_name" >> "$GITHUB_ENV"
+          if [ -f .tomos-site-ready ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -104,6 +127,7 @@ jobs:
     if: >-
       ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch')
       && github.repository != 'tomosweb/tomos-github-template'
+      && needs.build.outputs.site_ready == 'true'
     needs: build
     runs-on: ubuntu-latest
     permissions:
