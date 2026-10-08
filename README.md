@@ -18,7 +18,7 @@
 - Repositoryが `ユーザー名.github.io` の場合: `https://ユーザー名.github.io/`
 - それ以外の場合: `https://ユーザー名.github.io/Repository名/`
 
-初期のサイト名はRepository名です。Tomosのサイト作成処理から作成すると、指定したサイト名が反映されます。
+初期のサイト名はRepository名です。Tomosのサイト作成処理は `.tomos-site-name` に指定したサイト名を設定します。サイト作成が完了するまでは、Workflowはbuild検証のみを行い、Pagesへdeployしません。
 
 ## 初期構成
 
@@ -29,7 +29,7 @@
 
 ## 公開設定
 
-GitHub Pagesの公開元をGitHub Actionsに設定してから、`main`へ変更をpushしてください。初回セットアップ時はTomosのサイト作成処理がこの設定を行います。
+GitHub Pagesの公開元をGitHub Actionsに設定してから、`main`へ変更をpushしてください。Tomosのサイト作成処理はPagesをActionsに設定し、初期設定を完了してからdeployを開始します。
 
 ## Tomos Coreのバージョン
 
