@@ -34,3 +34,11 @@ GitHub Pagesの公開元をGitHub Actionsに設定してから、`main`へ変更
 ## Tomos Coreのバージョン
 
 WorkflowはTomos Publishing Coreの特定commitを利用します。バージョンを更新するときは互換性を確認して `TOMOS_VERSION` を変更してください。mainへ自動追従はしません。
+
+## テーマの選択と公開
+
+公開テーマは `tomos.config.php` の `theme.name` に指定します。Tomos標準テーマに加え、検証済みの独自テーマをRepositoryの `themes/<テーマ名>/` に登録できます。テーマを変更すると `main` へのpushによってGitHub Actionsが再生成します。
+
+Workflowは固定された対応済みTomos Coreを使用し、選択されているテーマのCSSと静的成果物を確認します。特定の固定ページや記事の存在には依存しません。テーマ名だけを変更してZIP未登録の場合はビルドが失敗します。
+
+> **公開準備中の注意**: 現行のサイト管理画面APIは固定文字列の `site.name`、`site.url`、`site.base_path` などを前提としており、このテンプレートの動的設定形式への対応が未完了です。一般向けのサイト設定画面をリリースする前に互換性を解消します。現段階ではサイト管理画面からの設定変更を正式サポート済みとは扱いません。
