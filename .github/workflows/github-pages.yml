@@ -136,6 +136,32 @@ jobs:
           fi
           grep -F "https://$owner.github.io$base_path/" "$OUTPUT_DIR/index.html"
 
+      - name: Verify site OGP fallback and article OGP precedence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$TOMOS_ROOT/theme-assets" "$GITHUB_WORKSPACE/content/news"
+          printf '%s' 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jawAAAABJRU5ErkJggg==' | base64 -d > "$TOMOS_ROOT/theme-assets/ogp.png"
+          cat > "$GITHUB_WORKSPACE/content/news/ogp-override-ci.md" <<'EOF'
+          ---
+          title: OGP override CI
+          date: 2026-10-22
+          image: https://example.com/article-specific-ogp.png
+          draft: false
+          ---
+
+          Test OGP priority.
+          EOF
+          test_output="$RUNNER_TEMP/tomos-site-branding-check"
+          php "$TOMOS_ROOT/tools/build-static-site.php" \
+            --config="$GITHUB_WORKSPACE/tomos.config.php" \
+            --tomos-root="$TOMOS_ROOT" \
+            --output="$test_output"
+          test -f "$test_output/theme-assets/ogp.png"
+          grep -F 'property="og:image"' "$test_output/index.html" | grep -F '/theme-assets/ogp.png'
+          grep -F 'property="og:image" content="https://example.com/article-specific-ogp.png"' "$test_output/news/ogp-override-ci/index.html"
+          grep -F 'name="twitter:image" content="https://example.com/article-specific-ogp.png"' "$test_output/news/ogp-override-ci/index.html"
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
