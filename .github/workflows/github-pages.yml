@@ -95,6 +95,13 @@ jobs:
             --tomos-root="$TOMOS_ROOT" \
             --output="$OUTPUT_DIR"
 
+      - name: Preserve custom domain
+        shell: bash
+        run: |
+          if [ -f CNAME ]; then
+            cp CNAME "$OUTPUT_DIR/CNAME"
+          fi
+
       - name: Verify generated site
         shell: bash
         run: |
@@ -126,7 +133,13 @@ jobs:
           if [ "$repository" = "$owner.github.io" ]; then
             base_path=""
           fi
-          grep -F "https://$owner.github.io$base_path/" "$OUTPUT_DIR/index.html"
+          if [ -f CNAME ]; then
+            domain="$(cat CNAME)"
+            test -f "$OUTPUT_DIR/CNAME"
+            grep -F "https://$domain/" "$OUTPUT_DIR/index.html"
+          else
+            grep -F "https://$owner.github.io$base_path/" "$OUTPUT_DIR/index.html"
+          fi
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
