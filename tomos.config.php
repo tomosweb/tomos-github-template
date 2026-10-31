@@ -13,6 +13,16 @@ if (!is_string($siteName) || trim($siteName) === '') {
 }
 
 $basePath = $repository === $owner . '.github.io' ? '' : '/' . $repository;
+$siteUrl = 'https://' . $owner . '.github.io';
+$customDomainFile = __DIR__ . '/CNAME';
+if (is_file($customDomainFile)) {
+    $customDomain = trim((string) file_get_contents($customDomainFile));
+    if (!preg_match('/\A(?=.{1,253}\z)(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}\z/D', $customDomain)) {
+        throw new RuntimeException('Invalid custom domain in CNAME.');
+    }
+    $siteUrl = 'https://' . strtolower($customDomain);
+    $basePath = '';
+}
 $tomosRoot = getenv('TOMOS_ROOT');
 if (!is_string($tomosRoot) || trim($tomosRoot) === '') {
     throw new RuntimeException('TOMOS_ROOT must point to the pinned Tomos checkout.');
@@ -22,7 +32,7 @@ return [
     'site' => [
         'name' => $siteName,
         'description' => '',
-        'url' => 'https://' . $owner . '.github.io',
+        'url' => $siteUrl,
         'base_path' => $basePath,
         'language' => 'ja',
     ],
