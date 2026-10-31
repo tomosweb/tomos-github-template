@@ -83,6 +83,20 @@ jobs:
           test -f "$TOMOS_ROOT/tests/static_site_local_theme_check.php"
           php "$TOMOS_ROOT/tests/static_site_local_theme_check.php"
 
+      - name: Verify custom domain build
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'blog.example.com\n' > CNAME
+          php "$TOMOS_ROOT/tools/build-static-site.php" \
+            --config="$GITHUB_WORKSPACE/tomos.config.php" \
+            --tomos-root="$TOMOS_ROOT" \
+            --output="$RUNNER_TEMP/tomos-custom-domain-build"
+          grep -F 'https://blog.example.com/' "$RUNNER_TEMP/tomos-custom-domain-build/index.html"
+          grep -F '/themes/' "$RUNNER_TEMP/tomos-custom-domain-build/index.html"
+          ! grep -F '/tomos-github/' "$RUNNER_TEMP/tomos-custom-domain-build/index.html"
+          rm CNAME
+
       - name: Build static site
         shell: bash
         run: |
