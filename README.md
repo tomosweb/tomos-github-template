@@ -37,6 +37,12 @@ WorkflowはTomos Publishing Coreの特定commitを利用します。バージョ
 
 ## テーマの選択と公開
 
+公式追加テーマの Tomos Quiet 1.0.5・Tomos Index 1.0.6・Tomos Wiki 1.0.0 は、サイト管理画面の既存のテーマ選択から利用できます。初期テーマは引き続きTomos Minimalです。
+
+QuietとIndexは固定Publishing Core内のファイルを利用します。Wikiは公式配布ZIPと同じファイルを `themes/wiki/` に同梱しています。テーマの切替で記事、画像、独自ドメインの設定は変わりません。
+
+すでに作成済みのサイトはテンプレートを取り込み直す必要がありません。対応する管理画面でWikiを選択・保存すると、未導入の場合だけ公式ファイルとテーマ設定を一緒に登録します。同名の登録済みテーマを自動更新・上書きすることはありません。
+
 公開テーマは `tomos.config.php` の `theme.name` に指定します。Tomos標準テーマに加え、検証済みの独自テーマをRepositoryの `themes/<テーマ名>/` に登録できます。テーマを変更すると `main` へのpushによってGitHub Actionsが再生成します。
 
 Workflowは固定された対応済みTomos Coreを使用し、選択されているテーマのCSSと静的成果物を確認します。特定の固定ページや記事の存在には依存しません。テーマ名だけを変更してZIP未登録の場合はビルドが失敗します。
